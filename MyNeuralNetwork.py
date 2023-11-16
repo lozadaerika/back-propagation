@@ -22,9 +22,11 @@ class MyNeuralNetwork:
     # activations
     self.xi = [np.zeros((1, size)) for size in layers]  
     # weights
-    self.w = [np.random.rand(layers[i], layers[i+1]) for i in range(self.L - 1)]  
+    #self.w = [np.zeros((layers[i], layers[i+1])) for i in range(self.L - 1)]  
+    self.w = [np.random.randn(layers[i], layers[i+1]) for i in range(self.L - 1)] #standard normal distribution randn
     # thresholds
-    self.theta = [np.zeros((1, size)) for size in layers[1:]]  
+    #self.theta = [np.zeros((1, size)) for size in layers[1:]]  
+    self.theta = [np.random.randn(1, size) for size in layers[1:]] #standard normal distribution randn
     # errors propagation
     self.delta = [np.zeros((1, size)) for size in layers] 
     # weights changes
@@ -53,6 +55,19 @@ class MyNeuralNetwork:
     for lay in range(1, self.L):
       self.w.append(np.zeros((layers[lay], layers[lay - 1])))
   
+  def feedForward(self, input):
+    self.xi[0] = input
+    for i in range(self.L - 1):
+      self.h[i + 1] = np.dot(self.xi[i], self.w[i]) + self.theta[i]
+      self.xi[i + 1] = self.activation(self.h[i + 1])
+    return self.xi[-1]
+
+  def activation(self, x):
+        if self.activation_function == 'sigmoid':
+            return (1 / (1 + np.exp(-x)))
+        else:
+            raise ValueError("Activation function not supported")
+
   def fit(X, y):
     """Train the network using backpropagation""" 
     """X-> array (n_samples,n_features), which holds the training samples represented as floating point feature vectors"""
