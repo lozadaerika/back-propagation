@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.model_selection import train_test_split
 
 # Neural Network class
 class MyNeuralNetwork:
@@ -67,11 +68,42 @@ class MyNeuralNetwork:
             return (1 / (1 + np.exp(-x)))
         else:
             raise ValueError("Activation function not supported")
+  
+  def activation_derivative(self, x):
+        if self.activation_function == 'sigmoid':
+            return x * (1 - x)
+        else:
+            raise ValueError("Activation function derivative not supported")
+ 
+  def backward(self, targets):
+        self.delta[-1] = (targets - self.xi[-1]) * self.activation_derivative(self.xi[-1])
+        for i in range(self.L - 2, 0, -1):
+            self.delta[i] = self.delta[i + 1].dot(self.w[i].T) * self.activation_derivative(self.xi[i])
+  
+  def update_weights_thresholds(self,x):
+        for i in range(self.L - 1):
+            self.d_w[i] = self.xi[i].T.dot(self.delta[i + 1]) * self.learning_rate
+            self.d_theta[i] = np.sum(self.delta[i + 1], axis=0, keepdims=True) * self.learning_rate
 
-  def fit(X, y):
+        for i in range(self.L - 1):
+            self.w[i] += self.d_w[i] + self.momentum * self.d_w_prev[i]
+            self.theta[i] += self.d_theta[i] + self.momentum * self.d_theta_prev[i]
+            self.d_w_prev[i] = self.d_w[i]
+            self.d_theta_prev[i] = self.d_theta[i]
+  
+
+  def fit(self,X, y):
     """Train the network using backpropagation""" 
     """X-> array (n_samples,n_features), which holds the training samples represented as floating point feature vectors"""
     """y->a vector of size (n_samples), which holds the target values (class labels) for the training samples"""
+
+    for epoch in range(self.epochs):
+        for i in range(len(training_patterns)):
+          ##
+          
+        # Store the errors in the history
+        
+
   
   def  predict(X):
     """Predict output from input X"""
