@@ -11,9 +11,9 @@ output_column=5
 test_percentage=0.15
 validation_percentage=0.25
 activation_function='sigmoid'
-learning_rate=0.01
-momentum=0.9
-epochs=1000
+#learning_rate=0.01
+#momentum=0.9
+#epochs=1000
 
 input_data = file_content[:, :input_columns]
 target_data = file_content[output_column]
@@ -29,6 +29,15 @@ model = LinearRegression()
 # Fit the model
 model.fit(input_train, target_train)
 
+# Evaluate model on the validation set
+validation_predictions = model.predict(input_val)
+print("Validation Predictions (Scikit-learn Linear Regression):", validation_predictions)
+
 # Evaluate model on the test set
 test_predictions = model.predict(input_test)
 print("Test Predictions (Scikit-learn Linear Regression):", test_predictions)
+
+validation_loss = np.mean((validation_predictions - target_val) ** 2)
+test_loss = np.mean((test_predictions - target_test) ** 2)
+print("Validation Loss (Scikit-learn Linear Regression):", validation_loss)
+print("Test Loss (Scikit-learn Linear Regression):", test_loss)
