@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
 # Read input and target data from file
-file_content =  np.loadtxt('A1-synthetic.txt')
+file_content =  np.loadtxt('A1-turbine.txt')
 
 input_columns=4
 output_column=5
