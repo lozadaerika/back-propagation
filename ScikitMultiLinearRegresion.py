@@ -2,9 +2,16 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
 
 # Read input and target data from file
-file_content =  np.loadtxt('A1-synthetic.txt')
+
+df= pd.read_csv('A1-turbine.txt',sep='	')
+input_data = df['#height_over_sea_level']
+target_data = df['power_of_hydroelectrical_turbine']
 
 input_columns=4
 output_column=5
@@ -14,9 +21,6 @@ activation_function='sigmoid'
 #learning_rate=0.01
 #momentum=0.9
 #epochs=1000
-
-input_data = file_content[:, :input_columns]
-target_data = file_content[output_column]
 
 # Split the data into training and test sets
 input_train_val, input_test, target_train_val, target_test = train_test_split(input_data, target_data, test_size=test_percentage, random_state=42)

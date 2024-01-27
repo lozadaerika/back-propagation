@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import pandas as pd
+import sys
 
 # Neural Network class
 class MyNeuralNetwork:
@@ -38,7 +39,7 @@ class MyNeuralNetwork:
     # previous thresholds changes used for momentum
     self.d_theta_prev = [np.zeros(( size)) for size in layers]
 
-    print(f"h: {self.h}, xi: {self.xi}, w: {self.w}, theta: {self.theta}, delta: {self.delta}, d_w: {self.d_w}, d_theta: {self.d_theta}, d_theta_prev: {self.d_theta_prev}")
+    #print(f"h: {self.h}, xi: {self.xi}, w: {self.w}, theta: {self.theta}, delta: {self.delta}, d_w: {self.d_w}, d_theta: {self.d_theta}, d_theta_prev: {self.d_theta_prev}")
     self.train_loss_history = []
     self.validation_loss_history = []
   
@@ -91,13 +92,13 @@ class MyNeuralNetwork:
   
   def activation_derivative(self, x):
         if self.activation_function == 'sigmoid':
-            return x * (1 - x)
+            return self.activation(x) * (1 - self.activation(x))
         elif self.activation_function == 'relu':
             return np.where(x > 0, 1, 0.01)
         elif self.activation_function == 'linear':
             return np.ones_like(x)
         elif self.activation_function == 'tanh':
-            return 1 - np.square(x)
+            return 1 - np.power(np.tanh(x), 2)
         else:
             raise ValueError("Activation function derivative not supported")
  
@@ -142,6 +143,7 @@ class MyNeuralNetwork:
     training_patterns, input_val, target_train, target_val = train_test_split(X, y, test_size=self.validation_percentage, random_state=42)
 
     for epoch in range(self.epochs):
+        print("Fit epoch>",epoch)
         training_used = set()
         for pat in range(len(training_patterns)):
            #random pattern 
@@ -165,8 +167,8 @@ class MyNeuralNetwork:
         val_predictions = np.array([self.feed_forward(x) for x in input_val])
         validation_error = np.mean(np.square(target_val - val_predictions))
 
-        self.train_loss_history.append(training_error)
-        self.validation_loss_history.append(validation_error)
+        self.train_loss_history.append((epoch,training_error))
+        self.validation_loss_history.append((epoch,validation_error))
   
   def  predict(self,X):
     """Predict output from input X"""
@@ -182,14 +184,18 @@ class MyNeuralNetwork:
     return np.mean(np.abs((y_real - y_pred) / y_real)) * 100
     
 
-file_content= pd.read_csv('A1-synthetic.txt',delimiter='\t', header=1)
+fileName='A1-personalized/A1-toxicity-normalized.csv'
 
-test_percentage=0.15
-validation_percentage=0.25
-activation_function='relu'
-learning_rate=0.01
-momentum=0.9
-epochs=1000
+file_content= pd.read_csv(fileName,delimiter=',')
+
+test_percentage=0.20
+validation_percentage=0.20
+activation_function='tanh'
+learning_rate=0.1
+momentum=0.7
+epochs=100
+
+saveFileName=fileName.split("/")[1].split(".")[0]+"-af-"+activation_function+"-e-"+str(epochs)+"-m-"+str(momentum)+"-lr-"+str(learning_rate)+"-vp-"+str(validation_percentage)+"-tp-"+str(test_percentage)
 
 input_data = file_content.iloc[:, :-1]
 target_data = file_content.iloc[:, -1]
@@ -208,17 +214,41 @@ nn.fit(validation_input_data, validation_target_data)
 
 #Plot training and validation loss history
 training_loss, validation_loss = nn.loss_epochs()
-plt.plot(training_loss, label='Training Loss')
-plt.plot(validation_loss, label='Validation Loss')
+plt.scatter(training_loss[:,0],training_loss[:,1], label='Training Loss')
+plt.scatter(validation_loss[:,0],validation_loss[:,1], label='Validation Loss')
 plt.xlabel('Epochs')
 plt.ylabel('Error')
 plt.legend()
+plt.savefig("results/"+saveFileName+"-error.png")
 plt.show()
 
 # Predict using the test set
 test_prediction = nn.predict(input_test)
-print("Test Prediction:", test_prediction)
-
 mape = nn.calculate_mape(target_test, test_prediction)
+
+with open("results/"+saveFileName+"output.txt", 'w') as file:      
+    sys.stdout = file
+    print("Test percentage:",test_percentage)
+    print("Validation percentage:",validation_percentage)
+    print("Activation function:",activation_function)
+    print("Learning rate:",learning_rate)
+    print("Momentum:",momentum)
+    print("Epochs:",epochs)
+    print("Real values:", target_test)
+    print("Test Prediction:", test_prediction)
+    print(f'MAPE: {mape:.2f}%')
+
+# Reset stdout to the original value
+sys.stdout = sys.__stdout__
+
+print("Real values:", target_test)
+print("Test Prediction:", test_prediction)
 print(f'MAPE: {mape:.2f}%')
+
+plt.scatter(target_test,test_prediction, label='Comparation')
+plt.xlabel('Real values')
+plt.ylabel('Test Prediction')
+plt.legend()
+plt.savefig("results/"+saveFileName+"-comparation.png")
+plt.show()
 
