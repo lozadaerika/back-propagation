@@ -206,19 +206,14 @@ nn = MyNeuralNetwork(layers, epochs=epochs, learning_rate=learning_rate, momentu
 
 nn.fit(validation_input_data, validation_target_data)
 
-training_loss, validation_loss = nn.loss_epochs()
-print("$$$",training_loss)
-print("##",validation_loss)
-
-"""#Plot training and validation loss history
+#Plot training and validation loss history
 training_loss, validation_loss = nn.loss_epochs()
 plt.plot(training_loss, label='Training Loss')
 plt.plot(validation_loss, label='Validation Loss')
 plt.xlabel('Epochs')
-plt.ylabel('Mean Squared Error')
+plt.ylabel('Error')
 plt.legend()
 plt.show()
- """
 
 # Predict using the test set
 test_prediction = nn.predict(input_test)
