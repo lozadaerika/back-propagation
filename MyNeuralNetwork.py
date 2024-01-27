@@ -81,7 +81,7 @@ class MyNeuralNetwork:
         if self.activation_function == 'sigmoid':
             return (1 / (1 + np.exp(-x)))
         elif self.activation_function == 'relu':
-            return np.maximum(0, x) #check formula
+            return np.maximum(0.01, x)
         elif self.activation_function == 'linear':
             return x
         elif self.activation_function == 'tanh':
@@ -93,7 +93,7 @@ class MyNeuralNetwork:
         if self.activation_function == 'sigmoid':
             return x * (1 - x)
         elif self.activation_function == 'relu':
-            return np.where(x > 0, 1, 0) #check formula
+            return np.where(x > 0, 1, 0.01)
         elif self.activation_function == 'linear':
             return np.ones_like(x)
         elif self.activation_function == 'tanh':
