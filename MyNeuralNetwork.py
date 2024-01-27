@@ -191,7 +191,6 @@ learning_rate=0.01
 momentum=0.9
 epochs=1000
 
-file_content= pd.read_csv('A1-synthetic.txt',sep=',')
 input_data = file_content.iloc[:, :-1]
 target_data = file_content.iloc[:, -1]
 
