@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
+import math
 
 # Neural Network class
 class MyNeuralNetwork:
@@ -64,20 +65,16 @@ class MyNeuralNetwork:
 
     # Hidden layers and output layer
     for layer in range(1, self.L):
-        for neuron in range(self.n[layer]):
-            self.calculate_activation(layer, neuron)
+      for neuron in range(self.n[layer]):
+        self.h[layer][neuron] = 0
+        for j in range(self.n[layer - 1]):
+          self.h[layer][neuron] += self.w[layer][neuron][j] * self.xi[layer - 1][j]
+        
+        self.h[layer][neuron] -= self.theta[layer][neuron]     
+        self.xi[layer][neuron] = self.activation(self.h[layer][neuron])
     
     return self.xi[self.L - 1][0]
   
-  def calculate_activation(self, layer, neuron):
-    # Calculate input
-    net_input = sum(self.w[layer][neuron][j] * self.xi[layer - 1][j] for j in range(self.n[layer - 1]))
-    net_input -= self.theta[layer][neuron]
-
-    # Activation function
-    self.h[layer][neuron] = net_input
-    self.xi[layer][neuron] = self.activation(net_input)
-
   def activation(self, x):
         if self.activation_function == 'sigmoid':
             return (1 / (1 + np.exp(-x)))
@@ -143,7 +140,6 @@ class MyNeuralNetwork:
     training_patterns, input_val, target_train, target_val = train_test_split(X, y, test_size=self.validation_percentage, random_state=42)
 
     for epoch in range(self.epochs):
-        print("Fit epoch>",epoch)
         training_used = set()
         for pat in range(len(training_patterns)):
            #random pattern 
@@ -167,6 +163,8 @@ class MyNeuralNetwork:
         val_predictions = np.array([self.feed_forward(x) for x in input_val])
         validation_error = np.mean(np.square(target_val - val_predictions))
 
+        print("Epoch:",epoch,"Validation Loss:",validation_error,"Training Loss:",training_error)
+
         self.train_loss_history.append((epoch,training_error))
         self.validation_loss_history.append((epoch,validation_error))
   
@@ -184,16 +182,21 @@ class MyNeuralNetwork:
     return np.mean(np.abs((y_real - y_pred) / y_real)) * 100
     
 
-fileName='A1-personalized/A1-toxicity-normalized.csv'
+fileName='A1-synthetic/A1-synthetic-normalized.csv'
+#fileName='A1-turbine/A1-turbine-normalized.csv'
 
 file_content= pd.read_csv(fileName,delimiter=',')
 
 test_percentage=0.20
 validation_percentage=0.20
-activation_function='tanh'
-learning_rate=0.1
-momentum=0.7
-epochs=100
+#activation_function='sigmoid'
+activation_function='relu'
+#activation_function='linear'
+#activation_function='tanh'
+momentum=0.3
+learning_rate=0.5
+epochs=50
+layers = [4, 9, 5, 1] 
 
 saveFileName=fileName.split("/")[1].split(".")[0]+"-af-"+activation_function+"-e-"+str(epochs)+"-m-"+str(momentum)+"-lr-"+str(learning_rate)+"-vp-"+str(validation_percentage)+"-tp-"+str(test_percentage)
 
@@ -207,7 +210,6 @@ target_data=target_data.values.tolist()
 validation_input_data, input_test, validation_target_data, target_test = train_test_split(input_data, target_data, test_size=test_percentage, random_state=42)
 
 # layers include input layer + hidden layers + output layer
-layers = [4, 9, 5, 1]
 nn = MyNeuralNetwork(layers, epochs=epochs, learning_rate=learning_rate, momentum=momentum,activation_function=activation_function,validation_percentage=validation_percentage)
 
 nn.fit(validation_input_data, validation_target_data)
