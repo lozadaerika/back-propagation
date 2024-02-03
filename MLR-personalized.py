@@ -11,12 +11,9 @@ def calculate_mape(y_real, y_pred):
 
 # Load dataset
 file_path = 'A1-personalized/A1-energy-normalized.csv'
-
 fileName="results/MLR/"+file_path.split("/")[1].split(".")[0]
-
 label="turbine"
 
-# Load data into DataFrames
 df = pd.read_csv(file_path, delimiter=',')
 X = df.iloc[:, :-1].values
 y = df.iloc[:, -1].values
@@ -52,21 +49,14 @@ plt.savefig(fileName+"-comparation.png")
 plt.show()
 
 with open(fileName+"-output.txt", 'w') as file:      
-    sys.stdout = file  # Redirect stdout
-    # Print the coefficients and intercept
-    #accuracy = accuracy_score(y_test, y_pred)
+    sys.stdout = file 
     print("Coefficients Separable: ", model.coef_)
     print("Intercept Separable:", model.intercept_)
     mse = mean_squared_error(y_test, y_pred)
-    r2 = r2_score(y_test, y_pred)
     print("Mean Squared Separable Error:", mse)
-    print("R-squared Separable:", r2)
-    #print("Accuracy:", accuracy*100)
 
 sys.stdout = sys.__stdout__
 
 print("Coefficients Separable: ", model.coef_)
 print("Intercept Separable:", model.intercept_)
 print("Mean Squared Separable Error:", mse)
-print("R-squared Separable:", r2)
-#print("Accuracy:", accuracy*100)
