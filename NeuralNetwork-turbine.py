@@ -29,8 +29,6 @@ X_train, X_test, y_train, y_test  = train_test_split(
 
 epoch=50
 
-epoch=50
-
 # Keras model
 model = Sequential()
 model.add(Dense(10, activation='relu', input_dim=X_train.shape[1]))
