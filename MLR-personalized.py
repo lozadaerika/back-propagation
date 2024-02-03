@@ -12,18 +12,18 @@ def calculate_mape(y_real, y_pred):
 # Load dataset
 file_path = 'A1-personalized/A1-energy-normalized.csv'
 fileName="results/MLR/"+file_path.split("/")[1].split(".")[0]
-label="turbine"
+label="energy"
 
 df = pd.read_csv(file_path, delimiter=',')
 X = df.iloc[:, :-1].values
 y = df.iloc[:, -1].values
-print(df.head())
+#print(df.head())
 
 #Separate train and test
 X_train, X_test, y_train, y_test  = train_test_split(
     X,
     y,
-    test_size=0.15,
+    test_size=0.20,
     random_state=42
 )
 
@@ -50,6 +50,9 @@ plt.show()
 
 with open(fileName+"-output.txt", 'w') as file:      
     sys.stdout = file 
+    print("Real values:", y_test)
+    print("Test Prediction:", y_pred)
+    print(f'MAPE: {mape:.2f}%')
     print("Coefficients Separable: ", model.coef_)
     print("Intercept Separable:", model.intercept_)
     mse = mean_squared_error(y_test, y_pred)
