@@ -11,11 +11,11 @@ def calculate_mape(y_real, y_pred):
     return np.mean(np.abs((y_real - y_pred) / y_real)) * 100
 
 # Load dataset
-file_path = 'A1-synthetic/A1-synthetic-normalized.csv'
+file_path = 'A1-personalized/A1-energy-normalized.csv'
 
 fileName="results/NeuralNetwork/"+file_path.split("/")[1].split(".")[0]
 
-label="synthetic"
+label="turbine"
 
 # Load data into DataFrames
 df = pd.read_csv(file_path, delimiter=',',header=None)

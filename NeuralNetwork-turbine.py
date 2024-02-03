@@ -12,23 +12,22 @@ def calculate_mape(y_real, y_pred):
 
 # Load dataset
 file_path = 'A1-turbine/A1-turbine-normalized.csv'
-
 fileName="results/NeuralNetwork/"+file_path.split("/")[1].split(".")[0]
-
 label="turbine"
 
-# Load data into DataFrames
 df = pd.read_csv(file_path, delimiter=',',header=None)
 X = df.iloc[:, :-1].values
 y = df.iloc[:, -1].values
 
-# Split the dataset into training and test sets with a 80:20 ratio
+# Split the dataset into training and test sets
 X_train, X_test, y_train, y_test  = train_test_split(
     X,
     y,
-    test_size=0.2,
+    test_size=0.15,
     random_state=42
 )
+
+epoch=50
 
 epoch=50
 
@@ -36,11 +35,19 @@ epoch=50
 model = Sequential()
 model.add(Dense(10, activation='relu', input_dim=X_train.shape[1]))
 model.add(Dense(4, activation='relu'))
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model.add(Dense(1, activation='relu'))
+model.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy','mean_squared_error'])
 
-model.fit(X_train, y_train, epochs=epoch, batch_size=32, validation_data=(X_test, y_test),verbose=0)
+model.fit(X_train, y_train, epochs=epoch, batch_size=32,verbose=0)
 
 y_pred = model.predict(X_test,verbose=0)
+
+y_pred_aux=y_test.copy()
+flat_list = [item for sublist in y_pred for item in sublist]
+for i in range(len(y_test)):
+    y_pred_aux[i]=flat_list[i]
+y_pred = y_pred_aux
+
 
 mape = calculate_mape(y_test, y_pred)
 print("Real values:", y_test)
@@ -54,22 +61,13 @@ plt.legend()
 plt.savefig(fileName+"-comparation.png")
 plt.show()
 
+results = model.evaluate(X_test, y_test)
+
 with open(fileName+"-output.txt", 'w') as file:      
-    sys.stdout = file  # Redirect stdout
-    # Print the coefficients and intercept
-    accuracy = accuracy_score(y_test, y_pred)
-    print("Coefficients Separable: ", model.coef_)
-    print("Intercept Separable:", model.intercept_)
+    sys.stdout = file
     mse = mean_squared_error(y_test, y_pred)
-    r2 = r2_score(y_test, y_pred)
-    print("Mean Squared Separable Error:", mse)
-    print("R-squared Separable:", r2)
-    print("Accuracy:", accuracy*100)
+    print("Mean Squared Separable Error:", results[2])
 
 sys.stdout = sys.__stdout__
 
-print("Coefficients Separable: ", model.coef_)
-print("Intercept Separable:", model.intercept_)
-print("Mean Squared Separable Error:", mse)
-print("R-squared Separable:", r2)
-print("Accuracy:", accuracy*100)
+print("Mean Squared Separable Error:", results[2])

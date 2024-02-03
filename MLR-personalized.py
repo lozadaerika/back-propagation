@@ -10,7 +10,7 @@ def calculate_mape(y_real, y_pred):
     return np.mean(np.abs((y_real - y_pred) / y_real)) * 100
 
 # Load dataset
-file_path = 'A1-turbine/A1-turbine-normalized.csv'
+file_path = 'A1-personalized/A1-energy-normalized.csv'
 
 fileName="results/MLR/"+file_path.split("/")[1].split(".")[0]
 
@@ -39,9 +39,6 @@ model.fit(X_train, y_train)
 # Predict on test set
 y_pred = model.predict(X_test)
 
-print("++++",y_test)
-print("///",y_pred)
-
 mape = calculate_mape(y_test, y_pred)
 print("Real values:", y_test)
 print("Test Prediction:", y_pred)
@@ -53,7 +50,6 @@ plt.ylabel('Test Prediction')
 plt.legend()
 plt.savefig(fileName+"-comparation.png")
 plt.show()
-
 
 with open(fileName+"-output.txt", 'w') as file:      
     sys.stdout = file  # Redirect stdout

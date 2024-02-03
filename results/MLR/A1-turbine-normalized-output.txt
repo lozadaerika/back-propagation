@@ -1,0 +1,4 @@
+Coefficients Separable:  [-6.04167499 -0.86987758  7.61048512  1.2773552 ]
+Intercept Separable: -0.5289458405158999
+Mean Squared Separable Error: 0.00159048781686256
+R-squared Separable: 0.977518199666971

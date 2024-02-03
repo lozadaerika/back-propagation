@@ -1,0 +1,2 @@
+Mean Squared Separable Error: 0.004790493675412195
+R-squared Separable: 0.9287227681920371

@@ -55,14 +55,14 @@ plt.show()
 with open(fileName+"-output.txt", 'w') as file:      
     sys.stdout = file  # Redirect stdout
     # Print the coefficients and intercept
-    accuracy = accuracy_score(y_test, y_pred)
+    #accuracy = accuracy_score(y_test, y_pred)
     print("Coefficients Separable: ", model.coef_)
     print("Intercept Separable:", model.intercept_)
     mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
     print("Mean Squared Separable Error:", mse)
     print("R-squared Separable:", r2)
-    print("Accuracy:", accuracy*100)
+    #print("Accuracy:", accuracy*100)
 
 sys.stdout = sys.__stdout__
 
@@ -70,4 +70,4 @@ print("Coefficients Separable: ", model.coef_)
 print("Intercept Separable:", model.intercept_)
 print("Mean Squared Separable Error:", mse)
 print("R-squared Separable:", r2)
-print("Accuracy:", accuracy*100)
+#print("Accuracy:", accuracy*100)
