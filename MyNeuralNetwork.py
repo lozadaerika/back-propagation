@@ -68,13 +68,28 @@ class MyNeuralNetwork:
       for neuron in range(self.n[layer]):
         self.h[layer][neuron] = 0
         for j in range(self.n[layer - 1]):
-          self.h[layer][neuron] += self.w[layer][neuron][j] * self.xi[layer - 1][j]
+          #self.h[layer][neuron] += self.w[layer][neuron][j] * self.xi[layer - 1][j]
+           val=self.valuesValidation(self.w[layer][neuron][j],self.xi[layer - 1][j])
+           self.h[layer][neuron] += val
         
         self.h[layer][neuron] -= self.theta[layer][neuron]     
         self.xi[layer][neuron] = self.activation(self.h[layer][neuron])
     
     return self.xi[self.L - 1][0]
   
+  def valuesValidation(self,value1, value2):
+    result=0
+    res = value1*value2
+    if(math.isnan(value1) or math.isinf(value1)):
+       result=0
+    if(math.isnan(value2) or math.isinf(value2)):
+       result=0
+    if(math.isnan(value1*value2) or math.isinf(value1*value2)):
+       result=0
+    if(math.isnan(res) or math.isinf(res)):
+       result=0
+    return result
+
   def activation(self, x):
         if self.activation_function == 'sigmoid':
             return (1 / (1 + np.exp(-x)))
@@ -190,11 +205,11 @@ file_content= pd.read_csv(fileName,delimiter=',')
 test_percentage=0.20
 validation_percentage=0.20
 #activation_function='sigmoid'
-activation_function='relu'
-#activation_function='linear'
+#activation_function='relu'
+activation_function='linear'
 #activation_function='tanh'
 momentum=0.3
-learning_rate=0.5
+learning_rate=0.3
 epochs=50
 layers = [4, 9, 5, 1] 
 

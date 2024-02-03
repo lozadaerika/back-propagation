@@ -5,7 +5,7 @@ from keras.layers import Dense
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
-from sklearn.metrics import accuracy_score,mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error
 
 def calculate_mape(y_real, y_pred):
     return np.mean(np.abs((y_real - y_pred) / y_real)) * 100
@@ -31,12 +31,16 @@ X_train, X_test, y_train, y_test  = train_test_split(
 )
 
 epoch=50
+activation_function='relu'
 
 # Keras model
 model = Sequential()
-model.add(Dense(10, activation='relu', input_dim=X_train.shape[1]))
-model.add(Dense(4, activation='relu'))
-model.add(Dense(1, activation='relu'))
+model.add(Dense(4, activation=activation_function, input_dim=X_train.shape[1]))
+model.add(Dense(9, activation=activation_function))
+model.add(Dense(5, activation=activation_function))
+model.add(Dense(1, activation=activation_function))
+
+#adam_optimizer = Adam(lr=learning_rate, momentum=momentum)
 model.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy','mean_squared_error'])
 
 model.fit(X_train, y_train, epochs=epoch, batch_size=32,verbose=0)
@@ -68,7 +72,11 @@ with open(fileName+"-output.txt", 'w') as file:
     sys.stdout = file
     mse = mean_squared_error(y_test, y_pred)
     print("Mean Squared Separable Error:", results[2])
+    print("Learning rate: ", model.optimizer.lr)
+    print("Momentum:", model.optimizer.beta_1)
 
 sys.stdout = sys.__stdout__
 
 print("Mean Squared Separable Error:", results[2])
+configured_learning_rate = model.optimizer.get_config()
+print(f"Optimizer configuration: {configured_learning_rate}")
