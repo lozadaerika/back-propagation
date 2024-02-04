@@ -36,8 +36,7 @@ activation_function='tanh'
 # Keras model
 model = Sequential()
 model.add(Dense(4, activation=activation_function, input_dim=X_train.shape[1]))
-model.add(Dense(9, activation=activation_function))
-model.add(Dense(5, activation=activation_function))
+model.add(Dense(3, activation=activation_function))
 model.add(Dense(1, activation=activation_function))
 
 model.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy','mean_squared_error'])
