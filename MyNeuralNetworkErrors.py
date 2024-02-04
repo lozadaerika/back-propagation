@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 import math
 
 # Neural Network class
-class MyNeuralNetwork:
+class MyNeuralNetworkErrors:
 
   def __init__(self, layers, epochs=1000, learning_rate=0.01,momentum=0.7,activation_function='sigmoid', validation_percentage=0.8):
     # number of layers
@@ -65,45 +65,16 @@ class MyNeuralNetwork:
       for neuron in range(self.n[layer]):
         self.h[layer][neuron] = 0
         for j in range(self.n[layer - 1]):
-          #self.h[layer][neuron] += self.w[layer][neuron][j] * self.xi[layer - 1][j]
-          val=self.valuesValidationMultiplication(self.w[layer][neuron][j],self.xi[layer - 1][j])
-          if(val==0):
-             self.h[layer][neuron]=0
-          else:
-            self.h[layer][neuron] += val
-        
+          self.h[layer][neuron] += self.w[layer][neuron][j] * self.xi[layer - 1][j]
+       
         self.h[layer][neuron] -= self.theta[layer][neuron]     
         self.xi[layer][neuron] = self.activation(self.h[layer][neuron])
     
     return self.xi[self.L - 1][0]
-  
-  def valuesValidationMultiplication(self,value1, value2):
-    res = value1*value2
-    if(math.isnan(res) or math.isinf(res)):
-       return 0
-    return res
-
-  def valuesValidationSigmoid(self, x):
-    exp = np.exp(-x)
-    if(math.isnan(exp) or math.isinf(exp)):
-      return 0
-    div=1 + np.exp(-x)
-    if(math.isnan(div) or math.isinf(div)):
-       return 0
-    res=1 / div
-    if(math.isnan(res) or math.isinf(res)):
-       return 0
-    return res
-  
-  def valueValidation(self,value1):
-    if(math.isnan(value1) or math.isinf(value1)):
-       return 0
-    return value1
 
   def activation(self, x):
         if self.activation_function == 'sigmoid':
-            #return (1 / (1 + np.exp(-x)))
-            return self.valuesValidationSigmoid(x)
+            return (1 / (1 + np.exp(-x)))
         elif self.activation_function == 'relu':
             return np.maximum(0.01, x)
         elif self.activation_function == 'linear':
@@ -136,12 +107,7 @@ class MyNeuralNetwork:
       for neuron in range(self.n[layer]):
         self.delta[layer][neuron] = 0
         for j in range(self.n[layer + 1]):
-          #self.delta[layer][neuron] += self.delta[layer + 1][j] * self.w[layer + 1][j][neuron]
-          val =self.valuesValidationMultiplication(self.delta[layer + 1][j],self.w[layer + 1][j][neuron])
-          if(val==0):
-            self.delta[layer][neuron]=0
-          else:
-            self.delta[layer][neuron] += val
+          self.delta[layer][neuron] += self.delta[layer + 1][j] * self.w[layer + 1][j][neuron]
           self.delta[layer][neuron] *= self.activation_derivative(self.h[layer][neuron])
   
 
@@ -151,34 +117,14 @@ class MyNeuralNetwork:
             for j in range(self.n[lay - 1]):
                 self.update_weights(lay, neuron, j)
             self.update_thresholds(lay, neuron)
-  
-  def valuesValidationAddition(self,value1, value2):
-    res = value1+value2
-    if(math.isnan(res) or math.isinf(res)):
-       return 0
-    return res 
-
-  def valuesValidationSquare(self,value1, value2):
-    res = np.square(value1 - value2)
-    for i in range(len(res)):
-      if(math.isnan(res[i]) or math.isinf(res[i])):
-        res[i]=0
-    return res 
-
+    
   def update_weights(self, lay, neuron, j):
-    #self.d_w[lay][neuron][j] = -self.learning_rate * self.delta[lay][neuron] * self.xi[lay - 1][j] + self.momentum * self.d_w_prev[lay][neuron][j]
-    val_momentum =self.valuesValidationMultiplication(self.momentum , self.d_w_prev[lay][neuron][j])
-    val_lr1 =self.valuesValidationMultiplication(self.delta[lay][neuron] , self.xi[lay - 1][j])
-    val_lr2 = self.valuesValidationMultiplication(-self.learning_rate , val_lr1)
-    self.d_w[lay][neuron][j] =self.valuesValidationAddition(val_lr2,val_momentum)
+    self.d_w[lay][neuron][j] = -self.learning_rate * self.delta[lay][neuron] * self.xi[lay - 1][j] + self.momentum * self.d_w_prev[lay][neuron][j]
     self.d_w_prev[lay][neuron][j] = self.d_w[lay][neuron][j]
     self.w[lay][neuron][j] += self.d_w[lay][neuron][j]
 
   def update_thresholds(self, lay, neuron):
-    #self.d_theta[lay][neuron] = self.learning_rate * self.delta[lay][neuron] + self.momentum * self.d_theta_prev[lay][neuron]
-    val_momentum =self.valuesValidationMultiplication( self.momentum , self.d_theta_prev[lay][neuron])
-    val_lr =self.valuesValidationMultiplication( self.learning_rate ,self.delta[lay][neuron])
-    self.d_theta[lay][neuron] ==self.valuesValidationAddition(val_lr,val_momentum)
+    self.d_theta[lay][neuron] = self.learning_rate * self.delta[lay][neuron] + self.momentum * self.d_theta_prev[lay][neuron]
     self.d_theta_prev[lay][neuron] = self.d_theta[lay][neuron]
     self.theta[lay][neuron] += self.d_theta[lay][neuron]
 
@@ -210,11 +156,9 @@ class MyNeuralNetwork:
         
         # Feed−forward patterns and calculate their prediction quadratic error
         train_predictions = np.array([self.feed_forward(x) for x in training_patterns])
-        #training_error = np.mean(np.square(target_train - train_predictions))
-        training_error = np.mean(self.valuesValidationSquare(target_train ,train_predictions))
+        training_error = np.mean(np.square(target_train - train_predictions))
         val_predictions = np.array([self.feed_forward(x) for x in input_val])
-        #validation_error = np.mean(np.square(target_val - val_predictions))
-        validation_error = np.mean(self.valuesValidationSquare(target_val , val_predictions))
+        validation_error = np.mean(np.square(target_val - val_predictions))
         if verbose:
           print("Epoch:",epoch,"Validation Loss:",validation_error,"Training Loss:",training_error)
 
