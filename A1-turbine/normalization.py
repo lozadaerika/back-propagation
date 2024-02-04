@@ -9,7 +9,6 @@ print(df.head())
 
 print(df.describe())
 
-# Extract the numerical columns for normalization
 numerical_columns = df.columns
 
 #Normalization
@@ -17,9 +16,6 @@ scaler = MinMaxScaler()
 df_normalized = pd.DataFrame(scaler.fit_transform(df[numerical_columns]), columns=numerical_columns)
 
 print(df_normalized.head())
-
-print(df_normalized.describe())
-
 
 output_file_name=name.split(".")[0]+'-normalized.csv'
 df_normalized.to_csv(output_file_name,sep=',', index=False,header=None)

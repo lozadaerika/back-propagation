@@ -9,7 +9,6 @@ print(df.head())
 
 print(df.describe())
 
-# Extract the numerical columns for normalization
 numerical_columns = df.columns
 
 #Normalization
