@@ -232,4 +232,8 @@ class MyNeuralNetwork:
     return np.array(self.train_loss_history), np.array(self.validation_loss_history)
 
   def calculate_mape(self,y_real, y_pred):
-    return np.mean(np.abs((y_real - y_pred) / y_real)) * 100
+    val = np.mean(np.abs((y_real - y_pred) / y_real)) * 100
+    if(math.isnan(val) or math.isinf(val)):
+       return 100
+    return val
+   
