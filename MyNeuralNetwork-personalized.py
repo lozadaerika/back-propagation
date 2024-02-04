@@ -16,7 +16,7 @@ momentums=[0.01,0.1,0.3]
 learning_rates=[0.3,0.5,0.9]
 eps=[50,100]
 
-layers = [8, 1] 
+layers = [4,3, 1] 
 
 input_data = file_content.iloc[:, :-1]
 target_data = file_content.iloc[:, -1]
