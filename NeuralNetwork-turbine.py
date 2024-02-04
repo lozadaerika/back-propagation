@@ -27,8 +27,8 @@ X_train, X_test, y_train, y_test  = train_test_split(
     random_state=42
 )
 
-epoch=50
-activation_function='relu'
+epoch=100
+activation_function='tanh'
 
 # Keras model
 model = Sequential()
@@ -37,7 +37,6 @@ model.add(Dense(9, activation=activation_function))
 model.add(Dense(5, activation=activation_function))
 model.add(Dense(1, activation=activation_function))
 
-#adam_optimizer = Adam(lr=learning_rate, momentum=momentum)
 model.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy','mean_squared_error'])
 
 model.fit(X_train, y_train, epochs=epoch, batch_size=32,verbose=0)
@@ -68,6 +67,9 @@ results = model.evaluate(X_test, y_test)
 with open(fileName+"-output.txt", 'w') as file:      
     sys.stdout = file
     mse = mean_squared_error(y_test, y_pred)
+    print("Real values:", y_test)
+    print("Test Prediction:", y_pred)
+    print(f'MAPE: {mape:.2f}%')
     print("Mean Squared Separable Error:", results[2])
     print("Learning rate: ", model.optimizer.lr)
     print("Momentum:", model.optimizer.beta_1)

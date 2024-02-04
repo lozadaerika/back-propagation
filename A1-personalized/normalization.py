@@ -13,17 +13,17 @@ print(df.describe())
 numerical_columns = df.columns
 
 #Normalization
-#scaler = MinMaxScaler()
-#df_normalized = pd.DataFrame(scaler.fit_transform(df[numerical_columns]), columns=numerical_columns)
-df_processed=df.copy()
+scaler = StandardScaler()
+df_normalized = pd.DataFrame(scaler.fit_transform(df[numerical_columns]), columns=numerical_columns)
+#df_processed=df.copy()
 # Data normalization
 # Min-Max Scaling
-df_processed.iloc[:, 1]= (df.iloc[:,1] - df.iloc[:,1].min()) / (df.iloc[:,1].max() - df.iloc[:,1].min())
-df_processed.iloc[:, 2]= (df.iloc[:,2] - df.iloc[:,2].min()) / (df.iloc[:,2].max() - df.iloc[:,2].min())
-df_processed.iloc[:, 3]= (df.iloc[:,3] - df.iloc[:,3].min()) / (df.iloc[:,3].max() - df.iloc[:,3].min())
+#df_processed.iloc[:, 1]= (df.iloc[:,1] - df.iloc[:,1].min()) / (df.iloc[:,1].max() - df.iloc[:,1].min())
+#df_processed.iloc[:, 2]= (df.iloc[:,2] - df.iloc[:,2].min()) / (df.iloc[:,2].max() - df.iloc[:,2].min())
+#df_processed.iloc[:, 3]= (df.iloc[:,3] - df.iloc[:,3].min()) / (df.iloc[:,3].max() - df.iloc[:,3].min())
 
-print(df_processed.head())
+print(df_normalized.head())
 
 output_file_name=name.split(".")[0]+'-normalized.csv'
-df_processed.to_csv(output_file_name,sep=',', index=False,header=None)
+df_normalized.to_csv(output_file_name,sep=',', index=False,header=None)
 

@@ -1,8 +1,5 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-import pandas as pd
-import sys
 import math
 
 # Neural Network class
@@ -68,31 +65,43 @@ class MyNeuralNetwork:
       for neuron in range(self.n[layer]):
         self.h[layer][neuron] = 0
         for j in range(self.n[layer - 1]):
+          #print("@",self.h[layer][neuron],self.w[layer][neuron][j],self.xi[layer - 1][j])
           #self.h[layer][neuron] += self.w[layer][neuron][j] * self.xi[layer - 1][j]
-           val=self.valuesValidation(self.w[layer][neuron][j],self.xi[layer - 1][j])
-           self.h[layer][neuron] += val
+          self.h[layer][neuron] += self.valuesValidationMultiplication(self.w[layer][neuron][j],self.xi[layer - 1][j])
+          #print("%", self.h[layer][neuron])
         
         self.h[layer][neuron] -= self.theta[layer][neuron]     
         self.xi[layer][neuron] = self.activation(self.h[layer][neuron])
     
     return self.xi[self.L - 1][0]
   
-  def valuesValidation(self,value1, value2):
-    result=0
+  def valuesValidationMultiplication(self,value1, value2):
     res = value1*value2
-    if(math.isnan(value1) or math.isinf(value1)):
-       result=0
-    if(math.isnan(value2) or math.isinf(value2)):
-       result=0
-    if(math.isnan(value1*value2) or math.isinf(value1*value2)):
-       result=0
     if(math.isnan(res) or math.isinf(res)):
-       result=0
-    return result
+       return 0
+    return res
+
+  def valuesValidationSigmoid(self, x):
+    exp = np.exp(-x)
+    if(math.isnan(exp) or math.isinf(exp)):
+      return 0
+    div=1 + np.exp(-x)
+    if(math.isnan(div) or math.isinf(div)):
+       return 0
+    res=1 / div
+    if(math.isnan(res) or math.isinf(res)):
+       return 0
+    return res
+  
+  def valueValidation(self,value1):
+    if(math.isnan(value1) or math.isinf(value1)):
+       return 0
+    return value1
 
   def activation(self, x):
         if self.activation_function == 'sigmoid':
-            return (1 / (1 + np.exp(-x)))
+            #return (1 / (1 + np.exp(-x)))
+            return self.valuesValidationSigmoid(x)
         elif self.activation_function == 'relu':
             return np.maximum(0.01, x)
         elif self.activation_function == 'linear':
@@ -125,7 +134,8 @@ class MyNeuralNetwork:
       for neuron in range(self.n[layer]):
         self.delta[layer][neuron] = 0
         for j in range(self.n[layer + 1]):
-          self.delta[layer][neuron] += self.delta[layer + 1][j] * self.w[layer + 1][j][neuron]
+          #self.delta[layer][neuron] += self.delta[layer + 1][j] * self.w[layer + 1][j][neuron]
+          self.delta[layer][neuron] += self.valuesValidationMultiplication(self.delta[layer + 1][j],self.w[layer + 1][j][neuron])
           self.delta[layer][neuron] *= self.activation_derivative(self.h[layer][neuron])
   
 
@@ -146,7 +156,7 @@ class MyNeuralNetwork:
     self.d_theta_prev[lay][neuron] = self.d_theta[lay][neuron]
     self.theta[lay][neuron] += self.d_theta[lay][neuron]
 
-  def fit(self,X, y):
+  def fit(self,X, y,verbose=True):
     """Train the network using backpropagation""" 
     """X-> array (n_samples,n_features), which holds the training samples represented as floating point feature vectors"""
     """y->a vector of size (n_samples), which holds the target values (class labels) for the training samples"""
@@ -177,8 +187,8 @@ class MyNeuralNetwork:
         training_error = np.mean(np.square(target_train - train_predictions))
         val_predictions = np.array([self.feed_forward(x) for x in input_val])
         validation_error = np.mean(np.square(target_val - val_predictions))
-
-        print("Epoch:",epoch,"Validation Loss:",validation_error,"Training Loss:",training_error)
+        if verbose:
+          print("Epoch:",epoch,"Validation Loss:",validation_error,"Training Loss:",training_error)
 
         self.train_loss_history.append((epoch,training_error))
         self.validation_loss_history.append((epoch,validation_error))
@@ -195,77 +205,3 @@ class MyNeuralNetwork:
 
   def calculate_mape(self,y_real, y_pred):
     return np.mean(np.abs((y_real - y_pred) / y_real)) * 100
-    
-
-fileName='A1-synthetic/A1-synthetic-normalized.csv'
-#fileName='A1-turbine/A1-turbine-normalized.csv'
-
-file_content= pd.read_csv(fileName,delimiter=',')
-
-test_percentage=0.20
-validation_percentage=0.20
-#activation_function='sigmoid'
-#activation_function='relu'
-activation_function='linear'
-#activation_function='tanh'
-momentum=0.3
-learning_rate=0.3
-epochs=50
-layers = [4, 9, 5, 1] 
-
-saveFileName=fileName.split("/")[1].split(".")[0]+"-af-"+activation_function+"-e-"+str(epochs)+"-m-"+str(momentum)+"-lr-"+str(learning_rate)+"-vp-"+str(validation_percentage)+"-tp-"+str(test_percentage)
-
-input_data = file_content.iloc[:, :-1]
-target_data = file_content.iloc[:, -1]
-
-input_data=input_data.values.tolist()
-target_data=target_data.values.tolist()
-
-# Split the data into training and test sets
-validation_input_data, input_test, validation_target_data, target_test = train_test_split(input_data, target_data, test_size=test_percentage, random_state=42)
-
-# layers include input layer + hidden layers + output layer
-nn = MyNeuralNetwork(layers, epochs=epochs, learning_rate=learning_rate, momentum=momentum,activation_function=activation_function,validation_percentage=validation_percentage)
-
-nn.fit(validation_input_data, validation_target_data)
-
-#Plot training and validation loss history
-training_loss, validation_loss = nn.loss_epochs()
-plt.scatter(training_loss[:,0],training_loss[:,1], label='Training Loss')
-plt.scatter(validation_loss[:,0],validation_loss[:,1], label='Validation Loss')
-plt.xlabel('Epochs')
-plt.ylabel('Error')
-plt.legend()
-plt.savefig("results/"+saveFileName+"-error.png")
-plt.show()
-
-# Predict using the test set
-test_prediction = nn.predict(input_test)
-mape = nn.calculate_mape(target_test, test_prediction)
-
-with open("results/"+saveFileName+"output.txt", 'w') as file:      
-    sys.stdout = file
-    print("Test percentage:",test_percentage)
-    print("Validation percentage:",validation_percentage)
-    print("Activation function:",activation_function)
-    print("Learning rate:",learning_rate)
-    print("Momentum:",momentum)
-    print("Epochs:",epochs)
-    print("Real values:", target_test)
-    print("Test Prediction:", test_prediction)
-    print(f'MAPE: {mape:.2f}%')
-
-# Reset stdout to the original value
-sys.stdout = sys.__stdout__
-
-print("Real values:", target_test)
-print("Test Prediction:", test_prediction)
-print(f'MAPE: {mape:.2f}%')
-
-plt.scatter(target_test,test_prediction, label='Comparation')
-plt.xlabel('Real values')
-plt.ylabel('Test Prediction')
-plt.legend()
-plt.savefig("results/"+saveFileName+"-comparation.png")
-plt.show()
-
